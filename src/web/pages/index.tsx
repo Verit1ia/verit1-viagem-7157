@@ -99,10 +99,23 @@ function Index() {
   const [selectedDestination, setSelectedDestination] = useState<typeof destinations[0] | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [showPriceComparison, setShowPriceComparison] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     setIsLoaded(true);
   }, []);
+
+  // Close mobile menu when clicking outside or on a link
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen]);
 
   const filteredDestinations = useMemo(() => {
     if (!searchQuery.trim()) return destinations;
@@ -128,6 +141,8 @@ function Index() {
             </div>
             <span className="text-xl font-semibold text-gray-900 tracking-tight">Viagens</span>
           </div>
+          
+          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
             <a href="#destinations" className="text-gray-600 hover:text-emerald-600 transition-colors font-medium">Destinations</a>
             <a href="#compare" className="text-gray-600 hover:text-emerald-600 transition-colors font-medium">Compare Prices</a>
@@ -135,8 +150,134 @@ function Index() {
               Book Now
             </button>
           </div>
+
+          {/* Mobile Hamburger Button */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="md:hidden relative w-10 h-10 flex items-center justify-center rounded-xl hover:bg-emerald-50 transition-colors"
+            aria-label="Toggle menu"
+          >
+            <div className="w-6 h-5 flex flex-col justify-between">
+              <span className={`w-full h-0.5 bg-gray-700 rounded-full transition-all duration-300 origin-left ${isMobileMenuOpen ? 'rotate-45 translate-x-px' : ''}`}></span>
+              <span className={`w-full h-0.5 bg-gray-700 rounded-full transition-all duration-300 ${isMobileMenuOpen ? 'opacity-0 scale-x-0' : ''}`}></span>
+              <span className={`w-full h-0.5 bg-gray-700 rounded-full transition-all duration-300 origin-left ${isMobileMenuOpen ? '-rotate-45 translate-x-px' : ''}`}></span>
+            </div>
+          </button>
         </div>
       </nav>
+
+      {/* Mobile Menu Overlay */}
+      <div 
+        className={`fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity duration-300 ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        onClick={() => setIsMobileMenuOpen(false)}
+      />
+
+      {/* Mobile Menu Panel */}
+      <div className={`fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white z-50 md:hidden shadow-2xl transition-transform duration-500 ease-out ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+        <div className="flex flex-col h-full">
+          {/* Mobile Menu Header */}
+          <div className="flex items-center justify-between p-6 border-b border-emerald-100">
+            <div className="flex items-center gap-2">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-200">
+                <span className="text-white font-bold text-lg tracking-tight">V1</span>
+              </div>
+              <span className="text-xl font-semibold text-gray-900 tracking-tight">Viagens</span>
+            </div>
+            <button
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-emerald-50 transition-colors"
+              aria-label="Close menu"
+            >
+              <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Mobile Search */}
+          <div className="p-6 border-b border-emerald-100">
+            <div className="relative">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <input
+                type="text"
+                placeholder="Search destinations..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 bg-emerald-50 border border-emerald-100 rounded-xl outline-none focus:border-emerald-300 transition-colors text-gray-700 placeholder:text-gray-400"
+              />
+            </div>
+          </div>
+
+          {/* Mobile Menu Links */}
+          <nav className="flex-1 p-6">
+            <ul className="space-y-2">
+              <li>
+                <a 
+                  href="#destinations" 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center gap-4 px-4 py-4 rounded-xl hover:bg-emerald-50 transition-colors group"
+                >
+                  <span className="w-10 h-10 flex items-center justify-center bg-emerald-100 rounded-xl text-lg group-hover:bg-emerald-200 transition-colors">🌍</span>
+                  <div>
+                    <span className="text-gray-900 font-medium block">Destinations</span>
+                    <span className="text-gray-500 text-sm">Explore popular places</span>
+                  </div>
+                </a>
+              </li>
+              <li>
+                <a 
+                  href="#compare" 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center gap-4 px-4 py-4 rounded-xl hover:bg-emerald-50 transition-colors group"
+                >
+                  <span className="w-10 h-10 flex items-center justify-center bg-emerald-100 rounded-xl text-lg group-hover:bg-emerald-200 transition-colors">📊</span>
+                  <div>
+                    <span className="text-gray-900 font-medium block">Compare Prices</span>
+                    <span className="text-gray-500 text-sm">Find the best deals</span>
+                  </div>
+                </a>
+              </li>
+              <li>
+                <a 
+                  href="#" 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center gap-4 px-4 py-4 rounded-xl hover:bg-emerald-50 transition-colors group"
+                >
+                  <span className="w-10 h-10 flex items-center justify-center bg-emerald-100 rounded-xl text-lg group-hover:bg-emerald-200 transition-colors">✈️</span>
+                  <div>
+                    <span className="text-gray-900 font-medium block">Flights</span>
+                    <span className="text-gray-500 text-sm">Book your travel</span>
+                  </div>
+                </a>
+              </li>
+              <li>
+                <a 
+                  href="#" 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center gap-4 px-4 py-4 rounded-xl hover:bg-emerald-50 transition-colors group"
+                >
+                  <span className="w-10 h-10 flex items-center justify-center bg-emerald-100 rounded-xl text-lg group-hover:bg-emerald-200 transition-colors">🏨</span>
+                  <div>
+                    <span className="text-gray-900 font-medium block">Hotels</span>
+                    <span className="text-gray-500 text-sm">Find accommodations</span>
+                  </div>
+                </a>
+              </li>
+            </ul>
+          </nav>
+
+          {/* Mobile Menu Footer */}
+          <div className="p-6 border-t border-emerald-100">
+            <button className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold rounded-xl transition-all shadow-lg shadow-emerald-200">
+              Book Now
+            </button>
+          </div>
+        </div>
+      </div>
 
       {/* Hero Section */}
       <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
